@@ -1,16 +1,16 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy import Text
+from sqlalchemy import Text as SQLAText # Alias Text to avoid potential conflicts
 
 db = SQLAlchemy()
 
 class Form(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    # Using Text for SQLite compatibility, JSONB for PostgreSQL
-    fields = db.Column(Text().with_variant(JSONB, "postgresql"), nullable=False)
+    description = db.Column(SQLAText, nullable=True)
+    # Use JSONB as the primary type, with SQLAText as the variant for SQLite
+    fields = db.Column(JSONB.with_variant(SQLAText, 'sqlite'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -32,8 +32,8 @@ class Form(db.Model):
 class Submission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     form_id = db.Column(db.Integer, db.ForeignKey('form.id'), nullable=False)
-    # Store submission data as JSON, ensuring no PII is explicitly stored
-    data = db.Column(Text().with_variant(JSONB, "postgresql"), nullable=False)
+    # Use JSONB as the primary type, with SQLAText as the variant for SQLite
+    data = db.Column(JSONB.with_variant(SQLAText, 'sqlite'), nullable=False)
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
@@ -43,6 +43,6 @@ class Submission(db.Model):
         return {
             'id': self.id,
             'form_id': self.form_id,
-            'data': self.data, # This will be a JSON string or dict depending on DB
+            'data': self.data,
             'submitted_at': self.submitted_at.isoformat()
         }
