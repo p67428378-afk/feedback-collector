@@ -92,3 +92,30 @@ def get_submissions(form_id):
     form = Form.query.get_or_404(form_id)
     submissions = Submission.query.filter_by(form_id=form.id).all()
     return jsonify([submission.to_dict() for submission in submissions]), 200
+
+# New endpoint for global submissions with sorting
+@api_bp.route('/submissions/all', methods=['GET'])
+def get_all_submissions():
+    sort_by = request.args.get('sort_by', 'submitted_at')
+    order = request.args.get('order', 'desc') # Default to descending
+
+    query = Submission.query.join(Form)
+
+    if sort_by == 'submitted_at':
+        if order == 'asc':
+            query = query.order_by(Submission.submitted_at.asc())
+        else:
+            query = query.order_by(Submission.submitted_at.desc())
+    # Add other sorting options here if needed in the future
+
+    all_submissions = query.all()
+    
+    # To include form title with each submission, we need to manually add it
+    # as join doesn't automatically add it to submission.to_dict()
+    result = []
+    for submission in all_submissions:
+        submission_dict = submission.to_dict()
+        submission_dict['form_title'] = submission.form.title
+        result.append(submission_dict)
+
+    return jsonify(result), 200
