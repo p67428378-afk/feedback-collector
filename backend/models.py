@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy import Text as SQLAText # Alias Text to avoid potential conflicts
+from sqlalchemy import Text as SQLAText
 
 db = SQLAlchemy()
 
@@ -9,14 +9,15 @@ class Form(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
     description = db.Column(SQLAText, nullable=True)
-    # Use JSONB as the primary type, with SQLAText as the variant for SQLite
-    fields = db.Column(JSONB.with_variant(SQLAText, 'sqlite'), nullable=False)
+    # Define SQLAText as the base type, and then specify JSONB for 'postgresql'
+    fields = db.Column(SQLAText().with_variant(JSONB(), 'postgresql'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     submissions = db.relationship('Submission', backref='form', lazy=True)
 
-    def __repr__(self):
+    def __repr__(
+        self):
         return f"<Form {self.title}>"
 
     def to_dict(self):
@@ -32,8 +33,8 @@ class Form(db.Model):
 class Submission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     form_id = db.Column(db.Integer, db.ForeignKey('form.id'), nullable=False)
-    # Use JSONB as the primary type, with SQLAText as the variant for SQLite
-    data = db.Column(JSONB.with_variant(SQLAText, 'sqlite'), nullable=False)
+    # Define SQLAText as the base type, and then specify JSONB for 'postgresql'
+    data = db.Column(SQLAText().with_variant(JSONB(), 'postgresql'), nullable=False)
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
