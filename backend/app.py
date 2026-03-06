@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-from backend.config import Config
-from backend.models import db
-from backend.routes import api_bp
+from .config import Config
+from .models import db
+from .routes import api_bp
 
 def create_app():
     app = Flask(__name__)
