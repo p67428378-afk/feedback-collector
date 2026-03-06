@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python/
+env/
+venv/
+*.egg-info/
+.tox/
+.coverage
+.pytest_cache/
+
+# Flask specific
+instance/
+.flaskenv
+
+# Node.js
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS generated files
+.DS_Store
+.Trashes
+Thumbs.db
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+
+# Database
+*.sqlite3
+*.db
